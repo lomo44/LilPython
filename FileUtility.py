@@ -76,6 +76,13 @@ def getRelativePath(_real, _root):
         newrelativetpath = relativepath[1:]
     return  newrelativetpath
 def selectivecopy(src,dst,list):
+    '''
+    Selectively copy directories in the directory
+    :param src:
+    :param dst:
+    :param list:
+    :return:
+    '''
     if not checkDirectoryExist(dst):
         os.makedirs(dst)
     listcpy = list.copy()
