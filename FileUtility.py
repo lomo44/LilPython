@@ -21,6 +21,9 @@ def copyDirectoryandContent(_fromDir, _toDir):
     '''
     shutil.copytree(_fromDir,_toDir)
 
+def delete_content_in_directory(src):
+    for dir in os.listdir(src):
+        delete_directory_and_content(dir)
 
 def checkDirectoryExist(_dir):
 
@@ -29,6 +32,17 @@ def checkDirectoryEmpty(_dir):
     return not os.listdir(_dir)
 def checkFileExist(_file):
     return os.path.exists(_file)
+def check_file_exist_in_directory(_file,dir):
+    for root, dirs,files in os.walk(dir):
+        for file in files:
+            if _file == file:
+                return True
+    return False
+def check_dir_exist_in_directory(_dir, dir):
+    for dir in os.listdir(dir):
+        if dir == _dir:
+            return  True
+    return False
 def searchFileInDirectory(_filename, _directory):
     for root,dirs,files in os.walk(_directory):
         for file in files:
@@ -93,6 +107,22 @@ def selectivecopy(src,dst,list):
             dstpathsrc = os.path.join(dst,dir)
             shutil.copytree(realpathsrc,dstpathsrc)
 
+
+def set_rw(operation, name, exc):
+    os.chmod(name, stat.S_IWRITE)
+    return True
+
+def clean_directory(src, excludelist):
+    excludelistcpy = excludelist.copy()
+    for root,dirs,files in os.walk(src):
+        for dir in dirs:
+            path = getRelativePath(os.path.join(root,dir),src)
+            if path !='' and path not in excludelistcpy:
+                os.chmod(os.path.join(root,dir), stat.S_IWRITE)
+                shutil.rmtree(os.path.join(root,dir), onerror=set_rw)
+
+def delete_directory_and_content(dir):
+    shutil.rmtree(os.path.join(dir), onerror=set_rw)
 ''' Zip Related'''
 
 def unzipfile(filename, directory):
@@ -147,7 +177,6 @@ def download_file(url, desc=None):
 
     return filename
 
-
-
 if __name__ == "__main__":
-    download_file("http://amf-farm2-winx6:8080/job/AMF_1.3_4Main_Nightly/3/artifact/*zip*/archive.zip")
+    #download_file("http://amf-farm2-winx6:8080/job/AMF_1.3_4Main_Nightly/3/artifact/*zip*/archive.zip")
+    clean_directory(r"C:\Depot\AMFDepot", ["Thirdparty"])
