@@ -38,9 +38,9 @@ def check_file_exist_in_directory(_file,dir):
             if _file == file:
                 return True
     return False
-def check_dir_exist_in_directory(_dir, dir):
+def check_dir_exist_in_directory(dirmame, dir):
     for dir in os.listdir(dir):
-        if dir == _dir:
+        if dir == dirmame:
             return  True
     return False
 def searchFileInDirectory(_filename, _directory):
