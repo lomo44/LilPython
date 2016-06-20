@@ -11,16 +11,21 @@ if sys.version_info >= (3,):
 else:
     import urllib2
     import urlparse
+def is_file(_path):
+    return os.path.isfile(_path)
+def is_dir(_path):
+    return os.path.isdir(_path)
+
 
 def copyDirectoryandContent(_fromDir, _toDir):
     '''
+    deprecated
     Function that copies directory and its content
     :param _fromDir: Source Directory
     :param _toDir: Target Directory
     :return: None
     '''
     shutil.copytree(_fromDir,_toDir)
-
 def delete_content_in_directory(src):
     for dir in os.listdir(src):
         delete_directory_and_content(dir)
@@ -123,6 +128,18 @@ def clean_directory(src, excludelist):
 
 def delete_directory_and_content(dir):
     shutil.rmtree(os.path.join(dir), onerror=set_rw)
+
+def copy_directory_and_content(_from, _to):
+    if not checkDirectoryExist(_to):
+        os.makedirs(_to, mode=0o777, exist_ok=True)
+    for item in os.listdir(_from):
+        torealpath = os.path.join(_to,item)
+        fromrealpath = os.path.join(_from,item)
+        if is_file(fromrealpath) and not checkFileExist(torealpath):
+            shutil.copyfile(fromrealpath,torealpath)
+        if is_dir(fromrealpath):
+            copy_directory_and_content(fromrealpath, torealpath)
+
 ''' Zip Related'''
 
 def unzipfile(filename, directory):
@@ -177,6 +194,58 @@ def download_file(url, desc=None):
 
     return filename
 
+
+def sync_folder_using_mtime(_remoteroot, _localroot):
+    updated = False
+    for root,dirs,files in os.walk(_remoteroot):
+        for file in files:
+            remoterealpath = os.path.join(root,file)
+            relativepath = getRelativePath(root, _remoteroot)
+            localrealpath = os.path.join(_localroot, relativepath, file)
+            try:
+                localmodifiedtime = getModifiedtime(localrealpath)
+
+            except:
+                localmodifiedtime = 0
+            remotemodifiedtime = getModifiedtime(remoterealpath)
+            if (remotemodifiedtime != localmodifiedtime):
+                print("Sync: " + localrealpath)
+                filedir = getFileDirectory(localrealpath);
+                if not checkDirectoryExist(filedir):
+                    os.makedirs(filedir)
+                updatefile(localrealpath, remoterealpath)
+                if updated is False:
+                    updated = True
+    print(_localroot + " is up-to-date")
+    return updated
+def selective_syncing(_remoteDir, _localDir, include_list, forceupdate = None, keeprelativepath = True):
+    updated = False
+    _include_list = include_list.copy()
+    for root, dirs, files in os.walk(_remoteDir):
+        for dir in dirs:
+            if dir in _include_list:
+                _include_list.remove(dir)
+                if keeprelativepath == False:
+                    localrealpath = os.path.join(_localDir,dir)
+                else:
+                    relativepath = getRelativePath(root,_remoteDir)
+                    localrealpath = os.path.join(_localDir,relativepath,dir)
+                remotepath = os.path.join(root,dir)
+                if checkDirectoryExist(localrealpath):
+                    if forceupdate:
+                        forceUpdateLocalTestDepot(remotepath,localrealpath)
+                    else:
+                        print("Local " + localrealpath + " exist, Syncing...")
+                        updated = sync_folder_using_mtime(remotepath, localrealpath)
+                else:
+                    print("Copying: "+ dir)
+                    copyDirectoryandContent(os.path.join(root,dir),localrealpath)
+                    updated = True
+            if len(_include_list) == 0:
+                return updated
+    return updated
 if __name__ == "__main__":
     #download_file("http://amf-farm2-winx6:8080/job/AMF_1.3_4Main_Nightly/3/artifact/*zip*/archive.zip")
-    clean_directory(r"C:\Depot\AMFDepot", ["Thirdparty"])
+    #clean_directory(r"C:\Depot\AMFDepot", ["Thirdparty"])
+    copy_directory_and_content(r'C:\Depot\AMFDepot\AMF\tests-amf\_results',
+                               r'\\amf-farm2-winx6\AMF-Results\4main_test_result')
