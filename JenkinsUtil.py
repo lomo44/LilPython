@@ -47,7 +47,6 @@ def fetch_artifact_from_jenkins_to_directory(Servername, Jobname, des, includeli
     removefile(zipfilepath)
 
 def fetch_buildlog_from_jenkins_to_directory(Servername, Jobname, des):
-    print("Getting Build Information From Jenkins...")
     jenkinsurl = "http://" + Servername + "/job/" + Jobname + "/lastSuccessfulBuild/consoleText"
     logfilename = download_file(jenkinsurl,des)
     return logfilename
