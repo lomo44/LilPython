@@ -1,14 +1,22 @@
 # Utility Functions regarding Jenkins
 import re
 import subprocess
-
+from FileUtility import *
 
 JENKINS_CLI_CALLER = 'java -jar jenkins-cli.jar'
 JENKINS_OPTION_SERVER_URL = '-s'
 JENKINS_CLI_FUNCTION_SETBUILD_DISPLAY_NAME = "set-build-display-name"
 
+def get_jenkins_server_url(server_name):
+    return 'http://' + server_name + "/"
+def combine_build_parameters(_list):
+    final = ''
+    for item in _list:
+        final += item + ' '
+    return final[0:len(final)-1]
 
 def fetch_artifact_from_jenkins_to_directory(Servername, Jobname, des, includelist):
+    print("Getting Build Artifacts From Jenkins...")
     includelistcpy = includelist.copy()
     jenkinsurl = "http://"+Servername + "/job/" + Jobname + "/lastSuccessfulBuild/artifact/*zip*/archive.zip"
     zipfilename = 'archive.zip'
@@ -39,6 +47,7 @@ def fetch_artifact_from_jenkins_to_directory(Servername, Jobname, des, includeli
     removefile(zipfilepath)
 
 def fetch_buildlog_from_jenkins_to_directory(Servername, Jobname, des):
+    print("Getting Build Information From Jenkins...")
     jenkinsurl = "http://" + Servername + "/job/" + Jobname + "/lastSuccessfulBuild/consoleText"
     logfilename = download_file(jenkinsurl,des)
     return logfilename
@@ -60,7 +69,6 @@ def parse_buildlog_from_jenkins(Logfile):
             if resultinfo and resultinfo.group(1) == syncingID:
                 return (resultinfo.group(1), resultinfo.group(2), resultinfo.group(3), resultinfo.group(4))
         return (syncingID, "Unknown", "Unknown", "Unknown")
-
 
 def parse_log_for_p4_sync_info(Logfile):
     syncingID = 0;
@@ -99,3 +107,4 @@ def change_build_discribtion(server_name, job_name, build_num, discribtion):
                      job_name,
                      build_num,
                      discribtion])
+

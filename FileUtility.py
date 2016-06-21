@@ -173,7 +173,7 @@ def download_file(url, desc=None):
         file_size = None
         if meta_length:
             file_size = int(meta_length[0])
-        print("Downloading: {0} Bytes: {1}".format(url, file_size))
+        #print("Downloading: {0} Bytes: {1}".format(url, file_size))
 
         file_size_dl = 0
         block_sz = 8192
@@ -189,8 +189,8 @@ def download_file(url, desc=None):
             if file_size:
                 status += "   [{0:6.2f}%]".format(file_size_dl * 100 / file_size)
             status += chr(13)
-            print(status, end="")
-        print()
+            #print(status, end="")
+        #print()
 
     return filename
 
@@ -248,4 +248,4 @@ if __name__ == "__main__":
     #download_file("http://amf-farm2-winx6:8080/job/AMF_1.3_4Main_Nightly/3/artifact/*zip*/archive.zip")
     #clean_directory(r"C:\Depot\AMFDepot", ["Thirdparty"])
     copy_directory_and_content(r'C:\Depot\AMFDepot\AMF\tests-amf\_results',
-                               r'\\amf-farm2-winx6\AMF-Results\4main_test_result')
+                               r'\\amf-farm2-winx6\AMF-Results\4main_test_result' + "\\"+ "wow")
