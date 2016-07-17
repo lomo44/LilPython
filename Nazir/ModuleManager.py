@@ -3,13 +3,16 @@ from importlib import *
 import Nazir.modules
 MODULE_DIRECTORY = r"Nazir\modules"
 
+# Global module list, contains all the module loaded in to Nazir
+GLOBAL_MODULE_LIST = []
+ESSENTIAL_MODULE_LIST = [
+]
 
 def Load_Modules():
     """
     Load Nazir Module, return a list of module object
     :return:
     """
-    module_list = []
     current_directory = os.getcwd()
     module_directory = os.path.join(current_directory,MODULE_DIRECTORY)
     for root, dirs, files in os.walk(module_directory):
@@ -20,16 +23,14 @@ def Load_Modules():
                 print("Loading " + filename)
                 module_class = getattr(module,filename)
                 module_object = module_class()
-                module_list.append(module_object)
-    return module_list
+                GLOBAL_MODULE_LIST.append(module_object)
 
 
-def module_check(module_list):
-    has_communication_module = False
-    has_kernel_module = False
-    for module in module_list:
-        if module.__class__.__name__ == "CommunicationModule":
-            has_communication_module = True
-        if module.__class__.__name__ == "KernelModule":
-            has_kernel_module = True
-    return has_communication_module and has_kernel_module
+def module_check():
+    module_list = ESSENTIAL_MODULE_LIST.copy()
+    for module in GLOBAL_MODULE_LIST:
+        if module.__class__.__name__ in module_list:
+            module_list.remove(module.__class__.__name__)
+    return len(module) is 0
+
+

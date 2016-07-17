@@ -1,10 +1,11 @@
 import abc
 
-
 class BaseModule(object):
     __metaclass__ = abc.ABCMeta
+    def __init__(self):
+        self.module_version = ''
     @abc.abstractproperty
-    def module_version(self):
+    def command_list(self):
         return 'Error'
 
     def get_version(self):
@@ -14,7 +15,7 @@ class BaseModule(object):
         """
         return self.module_version
 
-    @abc.abstractclassmethod
-    def response(self):
-        """User Input Response"""
+    def get_command_list(self):
+        return self.command_list
+
 

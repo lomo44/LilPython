@@ -140,6 +140,9 @@ def copy_directory_and_content(_from, _to):
         if is_dir(fromrealpath):
             copy_directory_and_content(fromrealpath, torealpath)
 
+def file_valid(file):
+    return is_file(file) and checkFileExist(file)
+
 ''' Zip Related'''
 
 def unzipfile(filename, directory):
